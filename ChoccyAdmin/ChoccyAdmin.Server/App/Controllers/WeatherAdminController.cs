@@ -1,24 +1,26 @@
+using ChoccyAdmin.Server.App.Models;
 using ChoccyAdmin.Server.Design;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TypeSharp;
 
-namespace ChoccyAdmin.Server.Controllers;
+namespace ChoccyAdmin.Server.App.Controllers;
 
 [ApiController]
-[ReactRoute("/c/weather-2")]
-[Route("api/[controller]")]
 [TypeScriptGenerator]
-public class WeatherForecast2Controller : ControllerBase, IWebPage<string>
+[Authorize(Roles = "Admin")]
+[ReactRoute("/weather/admin")]
+[Route("api/[controller]")]
+public class WeatherAdminController : ControllerBase, IWebPage<string>
 {
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<WeatherAdminController> _logger;
 
-    public WeatherForecast2Controller(ILogger<WeatherForecastController> logger)
+    public WeatherAdminController(ILogger<WeatherAdminController> logger)
     {
         _logger = logger;
     }

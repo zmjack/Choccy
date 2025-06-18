@@ -1,4 +1,4 @@
-﻿namespace ChoccyAdmin.Server;
+﻿namespace ChoccyAdmin.Server.Design;
 
 public interface IWebPage<T>
 {

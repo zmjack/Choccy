@@ -1,14 +1,16 @@
 import {
   HomeOutlined,
 } from '@ant-design/icons';
-import { NavLink, RouteObject, useLocation } from "react-router-dom";
-import { RouterItem, RouterConfig, getRoutes } from "../!autogen/Router";
+import { NavLink, useLocation } from "react-router-dom";
+import { RouteElement, RouteItem, RouterConfig, getRoutes } from "../!autogen/Router";
 import { Breadcrumb, Menu } from 'antd';
 import { ItemType, MenuItemType } from "antd/es/menu/interface";
 import { AppRouterConfig } from '../config/AppConfig';
 import { useEffect, useMemo, useState } from 'react';
+import { ChoccyAdmin } from '../!autogen/api';
+import UserProfile = ChoccyAdmin.Server.Controllers.UserController.UserProfile;
 
-function parse(items: RouterConfig, router: RouteObject, base?: string): ItemType<MenuItemType> {
+function parse(profile: UserProfile, items: RouterConfig, router: RouteItem, base?: string): ItemType<MenuItemType> | undefined {
   if (!base) base = '';
 
   let key: string;
@@ -19,12 +21,20 @@ function parse(items: RouterConfig, router: RouteObject, base?: string): ItemTyp
     else key = `${base}/${router.path}`
   }
 
-  const item = items[key] as RouterItem;
+  const item = items[key] as RouteElement;
+  if (router.access && router.access != '') {
+    const allows = router.access.split(',');
+    console.log(key, allows);
+    if (!allows.some(allow => profile.roles?.some(r => r == allow))) {
+      return undefined;
+    }
+  }
+
   return {
     key,
     label: router.children ? item?.label : <NavLink to={key}>{item?.label}</NavLink>,
     icon: item?.icon,
-    children: router.children?.map(r => parse(items, r, key)).filter(x => x)
+    children: router.children?.map(r => parse(profile, items, r, key)).filter(x => x !== undefined)
   }
 };
 
@@ -47,20 +57,20 @@ function getOpenKeys(path: string): string[] {
     list.push(result.value);
     result = it.next();
   }
-
   return list;
 }
 
 export function AppMenu(props: {
+  profile: UserProfile,
   config: RouterConfig,
   selectedKeys: [string],
-  onSelect?: (key: string, item: RouterItem) => void
+  onSelect?: (key: string, item: RouteElement) => void
 }) {
-  const { selectedKeys, config } = props;
+  const { profile, selectedKeys, config } = props;
 
   const items = useMemo<ItemType<MenuItemType>[]>(() => {
     const routes = getRoutes(AppRouterConfig);
-    const items = routes?.[0].children?.map(r => parse(config, r)).filter(x => x)!;
+    const items = routes?.[0].children?.map(r => parse(profile, config, r)).filter(x => x !== undefined)!;
     return items;
   }, [AppRouterConfig])
 
@@ -94,7 +104,7 @@ export function AppMenuBreadcrumb(props: {
     return (
       <Breadcrumb.Item
         key={key}
-        onClick={e => props.onClick?.(key)}
+        onClick={() => props.onClick?.(key)}
       >
         {/*<NavLink to={key}>{item.label}</NavLink>*/}
         {item.label}

@@ -1,26 +1,31 @@
-import App from '../App'
 import { ReactNode } from "react";
 import { RouteObject } from "react-router-dom";
+import App from '../App'
+import LoginApp from '../LoginApp';
 
-export type RouterItem = {
+export type RouteElement = {
   label: string,
   icon?: ReactNode,
   element?: ReactNode,
   order?: number,
+  access?: string
 }
 export type RouterConfig = {
-  '/': RouterItem,
-  '/c': RouterItem,
-  '/c/weather-2': RouterItem,
-  '/c/weather-1': RouterItem,
-  '/c2': RouterItem,
-  '/c2/weather-1': RouterItem
-} & Record<string, RouterItem>;
+  '/': RouteElement,
+  '/weather': RouteElement,
+  '/weather/admin': RouteElement,
+  '/weather/any': RouteElement,
+  '/weather/user': RouteElement
+} & Record<string, RouteElement>;
 
-type Item = RouteObject & { order?: number };
+export type RouteItem = RouteObject & {
+  order?: number,
+  access?: string,
+  children?: RouteItem[]
+};
 
-export function getRoutes(config: RouterConfig): Item[] {
-  function sort(a: Item, b: Item): number {
+export function getRoutes(config: RouterConfig): RouteItem[] {
+  function sort(a: RouteItem, b: RouteItem): number {
     return a.order! - b.order!;
   }
   return [{
@@ -30,31 +35,29 @@ export function getRoutes(config: RouterConfig): Item[] {
       path: '',
       order: config['/'].order,
       element: config['/'].element,
-      access: 'default'
+      access: ''
     }, {
-      path: 'c',
-      order: config['/c'].order,
+      path: 'weather',
+      order: config['/weather'].order,
       children: [{
-        path: 'weather-2',
-        order: config['/c/weather-2'].order,
-        element: config['/c/weather-2'].element,
-        access: 'default'
-      }, {
-        path: 'weather-1',
-        order: config['/c/weather-1'].order,
-        element: config['/c/weather-1'].element,
+        path: 'admin',
+        order: config['/weather/admin'].order,
+        element: config['/weather/admin'].element,
         access: 'Admin'
-      }].sort(sort)
-    }, {
-      path: 'c2',
-      order: config['/c2'].order,
-      children: [{
-        path: 'weather-1',
-        order: config['/c2/weather-1'].order,
-        element: config['/c2/weather-1'].element,
-        access: 'default'
+      }, {
+        path: 'any',
+        order: config['/weather/any'].order,
+        element: config['/weather/any'].element
+      }, {
+        path: 'user',
+        order: config['/weather/user'].order,
+        element: config['/weather/user'].element,
+        access: 'User'
       }].sort(sort)
     }].sort(sort)
+  }, {
+    path: '/login',
+    element: <LoginApp />
   }]
 };
 

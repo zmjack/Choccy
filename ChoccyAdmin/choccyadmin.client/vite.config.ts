@@ -50,6 +50,18 @@ export default defineConfig({
       '^/api/.*': {
         target,
         secure: false
+      },
+      '^/open/.*': {
+        target,
+        secure: false
+      },
+      '^/Account/.*': {
+        target,
+        secure: false
+      },
+      '^/User/.*': {
+        target,
+        secure: false
       }
     },
     port: 61453,

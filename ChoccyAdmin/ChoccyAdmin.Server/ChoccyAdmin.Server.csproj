@@ -17,11 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JSend" Version="1.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>7.*-*</Version>
     </PackageReference>
     <PackageReference Include="Prepare" Version="0.0.4" />
-    <PackageReference Include="TypeSharp" Version="3.0.0-alpha49" />
+    <PackageReference Include="TypeSharp" Version="3.0.0-alpha61" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

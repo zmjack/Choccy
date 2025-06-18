@@ -81,18 +81,26 @@ html, body {
     box-shadow: 4px 2px 2px -3px #999999;
 }
 
-.form-login-main {
-    min-width: 200px;
-    max-width: 420px;
-    margin: 0 auto;
-}
-
 .login-background {
     position: fixed;
     width: 100%;
     height: 100%;
+    z-index: -9999;
+}
+
+.login-background-light {
+    position: fixed;
+    width: 100%;
+    height: 100%;
     background: url(bg.png) no-repeat;
-    background-size: contain;
+    background-size: 100% 90%;
+    z-index: -9999;
+}
+
+.form-login-main {
+    min-width: 200px;
+    max-width: 380px;
+    margin: 140px auto;
 }
 
 .login-logo {
@@ -103,6 +111,28 @@ html, body {
 
 .login-card {
     margin-top: 10px;
-    background-color: rgba(255,255,255,0.5);
+    background-color: hsla(0,0%,100%,.50);
     box-shadow: grey 0px 0px 50px -30px;
+}
+
+.login-text {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.login-err-text {
+    text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.login-version {
+    text-align: center;
 }

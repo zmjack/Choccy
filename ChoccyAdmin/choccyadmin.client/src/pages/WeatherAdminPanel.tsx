@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ChoccyAdmin } from '../!autogen/api';
 
-let api = new ChoccyAdmin.Server.Controllers.WeatherForecastController();
+let api = new ChoccyAdmin.Server.App.Controllers.WeatherAdminController();
 
-function WeatherForecastPanel() {
+function WeatherAdminPanel() {
   const [forecasts, setForecasts] = useState<ChoccyAdmin.Server.WeatherForecast[] | undefined>();
 
   useEffect(() => {
-    api.get().then(response => setForecasts(response as ChoccyAdmin.Server.WeatherForecast[]));
+    api.get().then(response => setForecasts(response));
   }, []);
 
   const contents = forecasts === undefined
@@ -35,11 +35,11 @@ function WeatherForecastPanel() {
 
   return (
     <div>
-      <h1 id="tableLabel">Weather forecast</h1>
+      <h1 id="tableLabel">Weather forecast (Admin)</h1>
       <p>This component demonstrates fetching data from the server.</p>
       {contents}
     </div>
   );
 }
 
-export default WeatherForecastPanel;
+export default WeatherAdminPanel;

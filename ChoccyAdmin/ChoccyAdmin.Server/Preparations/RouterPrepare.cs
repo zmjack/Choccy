@@ -1,6 +1,5 @@
 ﻿using ChoccyAdmin.Server.Design;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using NStandard;
 using Prepare;
 using System.Reflection;
@@ -12,7 +11,7 @@ public class RouterPrepare : IDesignTimePrepareFactory
     public class Binding
     {
         public required string Path { get; set; }
-        public required string Access { get; set; }
+        public required string? Access { get; set; }
     }
 
     public class ReactRouteObject
@@ -97,9 +96,12 @@ public class RouterPrepare : IDesignTimePrepareFactory
                 var access = new Binding()
                 {
                     Path = template.Replace("[controller]", controllerName),
-                    Access = authorize is not null
-                        ? authorize.Policy ?? authorize.Roles ?? "default"
-                        : "default",
+                    Access = authorize is not null ? (
+                        from r in authorize.Roles?.Split(",") ?? []
+                        let name = r.Trim()
+                        where !string.IsNullOrEmpty(name)
+                        select name
+                    ).Join(",") : null,
                 };
                 accesses.Add(access);
             }
@@ -139,26 +141,35 @@ public class RouterPrepare : IDesignTimePrepareFactory
 {indent}}}";
         }
 
-        var code = $@"import App from '../App'
-import {{ ReactNode }} from ""react"";
+        var code = $@"import {{ ReactNode }} from ""react"";
 import {{ RouteObject }} from ""react-router-dom"";
+import App from '../App'
+import LoginApp from '../LoginApp';
 
-export type RouterItem = {{
+export type RouteElement = {{
   label: string,
   icon?: ReactNode,
   element?: ReactNode,
   order?: number,
+  access?: string
 }}
-export type RouterConfig = {{{(from r in AllReactRouteObjects(root) select $"\r\n  '{r.FullPath}': RouterItem").Join(",")}
-}} & Record<string, RouterItem>;
+export type RouterConfig = {{{(from r in AllReactRouteObjects(root) select $"\r\n  '{r.FullPath}': RouteElement").Join(",")}
+}} & Record<string, RouteElement>;
 
-type Item = RouteObject & {{ order?: number }};
+export type RouteItem = RouteObject & {{
+  order?: number,
+  access?: string,
+  children?: RouteItem[]
+}};
 
-export function getRoutes(config: RouterConfig): Item[] {{
-  function sort(a: Item, b: Item): number {{
+export function getRoutes(config: RouterConfig): RouteItem[] {{
+  function sort(a: RouteItem, b: RouteItem): number {{
     return a.order! - b.order!;
   }}
-  return [{CodeRoutes(root, new Indent(1, 2))}]
+  return [{CodeRoutes(root, new Indent(1, 2))}, {{
+    path: '/login',
+    element: <LoginApp />
+  }}]
 }};
 
 export function createRouterConfig(config: RouterConfig): RouterConfig {{
