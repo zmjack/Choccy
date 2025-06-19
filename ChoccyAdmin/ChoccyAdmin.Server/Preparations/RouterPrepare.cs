@@ -62,7 +62,7 @@ public class RouterPrepare : IDesignTimePrepareFactory
             {
                 Path = node,
                 FullPath = fullPath,
-                Order = $"{config}.order",
+                Order = $"({config} as any).order",
                 Children = [],
             };
             root.Children.Add(child);
@@ -149,14 +149,14 @@ import LoginApp from '../LoginApp';
 export type RouteElement = {{
   label: string,
   icon?: ReactNode,
-  element?: ReactNode,
-  order?: number,
-  access?: string
+  element?: ReactNode
 }}
 export type RouterConfig = {{{(from r in AllReactRouteObjects(root) select $"\r\n  '{r.FullPath}': RouteElement").Join(",")}
-}} & Record<string, RouteElement>;
+}};
 
-export type RouteItem = RouteObject & {{
+export type RouteItem = {{
+  path: string | undefined;
+  element?: React.ReactNode | undefined,
   order?: number,
   access?: string,
   children?: RouteItem[]
@@ -172,11 +172,23 @@ export function getRoutes(config: RouterConfig): RouteItem[] {{
   }}]
 }};
 
+export function getRouteObjects(config: RouterConfig): RouteObject[] {{
+  function parse(route: RouteItem): RouteObject {{
+    return {{
+      path: route.path,
+      element: route.element,
+      children: route.children?.map(parse)
+    }} satisfies RouteObject;
+  }}
+  const routes = getRoutes(config);
+  return routes.map(parse);
+}}
+
 export function createRouterConfig(config: RouterConfig): RouterConfig {{
   const keys = Object.keys(config);
   let i = 0;
   for (let key of keys) {{
-    config[key].order = i++;
+    (config as any)[key].order = i++;
   }}
   return config;
 }}

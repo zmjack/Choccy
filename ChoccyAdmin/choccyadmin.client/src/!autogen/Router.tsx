@@ -6,9 +6,7 @@ import LoginApp from '../LoginApp';
 export type RouteElement = {
   label: string,
   icon?: ReactNode,
-  element?: ReactNode,
-  order?: number,
-  access?: string
+  element?: ReactNode
 }
 export type RouterConfig = {
   '/': RouteElement,
@@ -16,9 +14,11 @@ export type RouterConfig = {
   '/weather/admin': RouteElement,
   '/weather/any': RouteElement,
   '/weather/user': RouteElement
-} & Record<string, RouteElement>;
+};
 
-export type RouteItem = RouteObject & {
+export type RouteItem = {
+  path: string | undefined;
+  element?: React.ReactNode | undefined,
   order?: number,
   access?: string,
   children?: RouteItem[]
@@ -33,24 +33,24 @@ export function getRoutes(config: RouterConfig): RouteItem[] {
     element: <App />,
     children: [{
       path: '',
-      order: config['/'].order,
+      order: (config['/'] as any).order,
       element: config['/'].element,
       access: ''
     }, {
       path: 'weather',
-      order: config['/weather'].order,
+      order: (config['/weather'] as any).order,
       children: [{
         path: 'admin',
-        order: config['/weather/admin'].order,
+        order: (config['/weather/admin'] as any).order,
         element: config['/weather/admin'].element,
         access: 'Admin'
       }, {
         path: 'any',
-        order: config['/weather/any'].order,
+        order: (config['/weather/any'] as any).order,
         element: config['/weather/any'].element
       }, {
         path: 'user',
-        order: config['/weather/user'].order,
+        order: (config['/weather/user'] as any).order,
         element: config['/weather/user'].element,
         access: 'User'
       }].sort(sort)
@@ -61,11 +61,23 @@ export function getRoutes(config: RouterConfig): RouteItem[] {
   }]
 };
 
+export function getRouteObjects(config: RouterConfig): RouteObject[] {
+  function parse(route: RouteItem): RouteObject {
+    return {
+      path: route.path,
+      element: route.element,
+      children: route.children?.map(parse)
+    } satisfies RouteObject;
+  }
+  const routes = getRoutes(config);
+  return routes.map(parse);
+}
+
 export function createRouterConfig(config: RouterConfig): RouterConfig {
   const keys = Object.keys(config);
   let i = 0;
   for (let key of keys) {
-    config[key].order = i++;
+    (config as any)[key].order = i++;
   }
   return config;
 }

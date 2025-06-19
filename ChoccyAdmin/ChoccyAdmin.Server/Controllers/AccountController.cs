@@ -94,4 +94,10 @@ public class AccountController : Controller
         await HttpContext.SignOutAsync();
         return LocalRedirect("/login");
     }
+
+    [HttpGet]
+    public ContentResult AccessDenied()
+    {
+        return Content("Access denied.");
+    }
 }

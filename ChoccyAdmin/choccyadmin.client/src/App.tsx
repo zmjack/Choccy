@@ -1,4 +1,4 @@
-import { Button, Col, Layout, Menu, Row, Space } from 'antd';
+import { Layout } from 'antd';
 import React, { useEffect, useState } from 'react';
 import LogoSVG from './assets/react.svg';
 import { AppConfig } from './config/AppConfig';
@@ -26,7 +26,7 @@ const App: React.FC = () => {
       .then(profile => {
         setProfile(profile);
       })
-      .catch(err => {
+      .catch(() => {
         navigate(`/login?returnUrl=${location.pathname}`);
       });
   }, []);

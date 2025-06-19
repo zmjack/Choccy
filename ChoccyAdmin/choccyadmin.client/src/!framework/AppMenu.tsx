@@ -21,10 +21,9 @@ function parse(profile: UserProfile, items: RouterConfig, router: RouteItem, bas
     else key = `${base}/${router.path}`
   }
 
-  const item = items[key] as RouteElement;
+  const item = (items as any)[key] as RouteElement;
   if (router.access && router.access != '') {
     const allows = router.access.split(',');
-    console.log(key, allows);
     if (!allows.some(allow => profile.roles?.some(r => r == allow))) {
       return undefined;
     }
@@ -85,7 +84,7 @@ export function AppMenu(props: {
       selectedKeys={selectedKeys}
       items={items}
       onSelect={item => {
-        props.onSelect?.(item.key, config[item.key]);
+        props.onSelect?.(item.key, (config as any)[item.key]);
       }}
       onOpenChange={keys => setOpenKeys(keys)}
     />
@@ -100,7 +99,7 @@ export function AppMenuBreadcrumb(props: {
 
   const extraBreadcrumbItems = pathSnippets.map((_, index) => {
     const key = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-    const item = AppRouterConfig[key];
+    const item = (AppRouterConfig as any)[key];
     return (
       <Breadcrumb.Item
         key={key}

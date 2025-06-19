@@ -1,7 +1,6 @@
 import { ChoccyAdmin } from '../!autogen/api';
-import { Alert, Button, Col, Divider, Dropdown, MenuProps, Row, Space } from 'antd';
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Alert, Col, Dropdown, MenuProps, Row } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import { useMemo } from 'react';
 import UserProfile = ChoccyAdmin.Server.Controllers.UserController.UserProfile;
 
